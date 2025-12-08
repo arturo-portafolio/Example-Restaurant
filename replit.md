@@ -2,13 +2,14 @@
 
 ## Recent Changes
 
-**December 8, 2025** - Initial MVP completed
-- Implemented complete single-page restaurant website with all required sections
-- Added responsive design with mobile hamburger menu and desktop navigation
-- Integrated WhatsApp deep linking for reservations and contact
-- Created floating chatbot widget with keyword-based responses
-- Fixed WhatsApp validation to allow demonstration with example number
-- All functionality tested and verified working correctly
+**December 8, 2025** - Major redesign and chatbot upgrade
+- Changed color palette from orange to elegant restaurant theme (burgundy wine #6B1E1E, gold #C59D5F, beige #FAF3E0)
+- Redesigned hero section with two-column layout featuring restaurant image
+- Removed WhatsApp button from hero, now only in contact section
+- Upgraded chatbot from static responses to AI/GPT backend integration via n8n
+- Added typing indicator for chatbot responses
+- Implemented async/await for backend communication with error handling
+- All changes tested and verified responsive on desktop and mobile
 
 ## Overview
 
