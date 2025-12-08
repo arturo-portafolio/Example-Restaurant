@@ -265,26 +265,39 @@ function closeChatbot() {
 async function sendMessage() {
     const chatInput = document.getElementById('chatInput');
     const chatSend = document.getElementById('chatSend');
+
+    // Si no existen los elementos, salir
+    if (!chatInput || !chatSend) {
+        return;
+    }
+
+    // Si ya está esperando respuesta, no permitir otro envío
+    if (chatInput.disabled || chatSend.disabled) {
+        return;
+    }
+
     const message = chatInput.value.trim();
-    
-    // Validar que el mensaje no esté vacío
+
+    // No enviar mensajes vacíos
     if (message === '') {
         return;
     }
-    
+
     // Deshabilitar input y botón mientras se procesa
     chatInput.disabled = true;
     chatSend.disabled = true;
-    
+    chatInput.classList.add('chat-input-disabled');
+    chatSend.classList.add('chat-send-disabled');
+
     // Agregar mensaje del usuario
     addUserMessage(message);
-    
+
     // Limpiar input
     chatInput.value = '';
-    
+
     // Mostrar indicador de "Escribiendo..."
     const typingIndicator = addTypingIndicator();
-    
+
     // Obtener respuesta del backend
     try {
         const botResponse = await sendMessageToBackend(message);
@@ -297,9 +310,12 @@ async function sendMessage() {
         // Habilitar de nuevo input y botón
         chatInput.disabled = false;
         chatSend.disabled = false;
+        chatInput.classList.remove('chat-input-disabled');
+        chatSend.classList.remove('chat-send-disabled');
         chatInput.focus();
     }
 }
+
 
 function addUserMessage(message) {
     chatMessages.push({ type: 'user', text: message });
