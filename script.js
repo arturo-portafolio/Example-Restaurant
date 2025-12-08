@@ -72,6 +72,11 @@ const menuItems = [
         nombre: "Tres Leches",
         descripcion: "Delicioso postre de tres leches con crema batida.",
         precio: "$5.00"
+    },
+    { id: 9, 
+     nombre: "Carimañolas Rellenas", 
+     descripcion: "Carimañolas de yuca fritas rellenas de carne y queso, servidas con salsa blanca.", 
+     precio: "$6.50" 
     }
 ];
 
