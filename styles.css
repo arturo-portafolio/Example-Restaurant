@@ -535,6 +535,18 @@ section {
     transform: scale(1.05);
 }
 
+/* Efecto “frost” cuando el chat está esperando respuesta */
+.chat-input:disabled,
+.chat-send:disabled,
+.chat-input-disabled,
+.chat-send-disabled {
+    opacity: 0.6;
+    filter: blur(0.3px);
+    cursor: not-allowed;
+    transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+
 /* Responsive - Móvil */
 @media (max-width: 768px) {
     .menu-toggle {
