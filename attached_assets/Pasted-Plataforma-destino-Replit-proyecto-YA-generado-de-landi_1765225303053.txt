@@ -1,0 +1,259 @@
+Plataforma destino:
+- Replit (proyecto YA generado de landing de restaurante con burbuja de chat y botón de WhatsApp)
+
+Objetivo:
+- A partir del código EXISTENTE, ajustar la página del restaurante para:
+  - Mantener un botón de contacto por WhatsApp SOLO en la sección final de contacto (NO en el inicio/hero).
+  - Usar una paleta de colores de restaurante que NO incluya naranjas.
+  - Asegurar que el chatbot sea un **chatbot web embebido (on-site)** con backend de IA/GPT (por ejemplo, vía n8n) y que **NO dependa de WhatsApp**.
+  - Añadir una imagen principal atractiva en el inicio (sección hero), sin botón de WhatsApp allí.
+  - Conservar el diseño responsive para escritorio y móvil.
+
+Alcance (MVP sobre el proyecto ya generado):
+- No crear un proyecto nuevo; TOMAR el proyecto actual y:
+  1. Reemplazar la paleta de colores (sin tonos naranjas).
+  2. Ajustar la sección hero para incluir una imagen grande y bonita, SIN botón de WhatsApp.
+  3. Asegurar que la burbuja de chat sea un chatbot web embebido que responde dentro de la página usando un backend de IA/GPT (preparar integración vía HTTP con n8n), sin abrir WhatsApp.
+  4. Mantener el botón de WhatsApp únicamente en la sección de contacto al final de la página (quitar cualquier botón de WhatsApp que esté en el hero o secciones superiores).
+
+Roles de usuario:
+- Visitante:
+  - Navega por la página.
+  - Ve la imagen principal del restaurante en el hero.
+  - Consulta menú, horario, dirección.
+  - Abre el chatbot embebido y chatea dentro de la página.
+  - Desde la sección de contacto final, puede hacer clic en el botón de WhatsApp para conversar por ese canal (fuera de la web).
+- Administrador (implícito):
+  - Ajusta colores, textos, número de WhatsApp y URL del backend de chatbot editando el código.
+
+Funcionalidades clave (ajustes sobre lo ya generado):
+- Paleta de colores:
+  - Sustituir cualquier color principal naranja por una combinación tipo restaurante elegante:
+    - Color primario: vino tinto oscuro (ej. `#6B1E1E`).
+    - Color secundario/acento: dorado suave (ej. `#C59D5F`).
+    - Fondo principal: beige muy claro (ej. `#FAF3E0`).
+    - Texto principal: gris muy oscuro (ej. `#1F2933`).
+  - Aplicar:
+    - Botones principales (CTA, excepto WhatsApp) → color primario.
+    - Hover de botones → tono más oscuro del primario.
+    - Burbuja de chat → acento dorado con ícono blanco.
+  - Eliminar o reemplazar todos los estilos que usen naranja (`#ff9800`, `#ffa500`, etc.).
+
+- Sección hero con imagen (SIN botón de WhatsApp):
+  - Modificar la sección de portada para que tenga:
+    - Texto con:
+      - Nombre del restaurante.
+      - Eslogan.
+      - Breve descripción o llamada a la acción genérica (ej. “Descubre nuestros sabores caseros”).
+      - Botón de acción que NO sea WhatsApp, por ejemplo: “Ver menú” o “Conocer más” que haga scroll a la sección de menú/información.
+    - Una imagen grande, atractiva, de un restaurante/comida.
+  - Asegurarse de que en el HERO:
+    - NO haya botones ni enlaces a WhatsApp.
+    - NO haya iconos de WhatsApp.
+  - En escritorio:
+    - Layout en dos columnas: texto a la izquierda y imagen a la derecha (o viceversa).
+  - En móviles:
+    - La imagen y el texto deben ir apilados verticalmente.
+  - Usar una imagen desde URL (ejemplo de stock libre) con:
+    - Un `<img>` con clase propia.
+    - `alt` descriptivo (por ejemplo: `alt="Mesa de restaurante con platos de comida apetitosos"`).
+    - Comentario en el código indicando que la URL puede ser cambiada por una imagen propia.
+
+- Sección de contacto final con botón de WhatsApp:
+  - Mantener o crear una sección al final de la página, por ejemplo con id `contacto`.
+  - Contenidos:
+    - Título: “Contacto” o similar.
+    - Dirección en texto.
+    - Teléfono.
+    - Horario resumido.
+    - Botón claro “Reservar por WhatsApp” o “Escríbenos por WhatsApp”.
+  - Este botón:
+    - Debe usar la URL `https://wa.me/NUMERO?text=MENSAJE`.
+    - Debe abrir en nueva pestaña (`target="_blank"`).
+  - IMPORTANTE: Este debe ser el ÚNICO botón de WhatsApp de la página (eliminar cualquier otro, especialmente en el hero).
+
+- Chatbot web embebido (on-site) con backend IA/GPT:
+  - Mantener la burbuja flotante en la esquina inferior derecha, asegurando que:
+    - Al hacer clic se abre una ventana de chat DENTRO de la página (no se abre WhatsApp ni otro sitio).
+  - Ventana de chat:
+    - Cabecera con nombre del restaurante y botón de cerrar.
+    - Lista de mensajes (usuario y bot).
+    - Input de texto y botón “Enviar”.
+  - Lógica de chatbot:
+    - Dejar de depender solo de respuestas estáticas por palabras clave.
+    - Implementar una función JS `sendMessageToChatbot(message)` que:
+      - Use `fetch` hacia una URL de API (backend en n8n que conecta con GPT).
+      - Envíe un cuerpo JSON con el mensaje del usuario.
+      - Espere una respuesta JSON del estilo: `{ "reply": "texto de la respuesta" }`.
+    - Mientras se espera la respuesta:
+      - Mostrar un indicador “Escribiendo…” o un estado de carga.
+    - Al recibir la respuesta:
+      - Mostrar el contenido del campo `reply` como mensaje del bot en el historial.
+    - Definir una constante editable para la URL:
+      - `const CHATBOT_API_URL = 'https://TU-ENDPOINT-N8N-AQUI';`
+      - Incluir comentario indicando que esta URL debe apuntar al workflow de n8n que usa GPT.
+  - Independencia de WhatsApp:
+    - El chatbot embebido NO debe abrir, llamar ni mencionar WhatsApp.
+    - El chat solo se comunica con el backend IA/GPT vía HTTP.
+    - Mantener la integración de WhatsApp únicamente como botón al final (sección de contacto).
+
+Flujos principales (considerando los ajustes):
+- Flujo 1: Navegación y visual inicial
+  - El usuario entra a la página.
+  - Ve la sección hero con nueva paleta (vino, dorado, beige) y la imagen del restaurante.
+  - No ve ningún botón de WhatsApp en el hero, solo un botón tipo “Ver menú” que hace scroll a la sección correspondiente.
+
+- Flujo 2: Contacto por WhatsApp (solo al final):
+  - El usuario navega hacia abajo hasta la sección de contacto al final.
+  - Ve la dirección, horario, teléfono y el botón de WhatsApp.
+  - Al hacer clic en ese botón:
+    - Se abre una nueva pestaña con la conversación de WhatsApp al número configurado.
+
+- Flujo 3: Uso del chatbot embebido con backend IA/GPT:
+  - El usuario hace clic en la burbuja de chat.
+  - Se abre la ventana de chat dentro de la página.
+  - Al enviar un mensaje:
+    - El mensaje aparece como burbuja del usuario.
+    - Se muestra “Escribiendo…” o un spinner.
+    - Se envía el mensaje al endpoint `CHATBOT_API_URL` via `fetch` (POST, JSON).
+    - Al recibir la respuesta:
+      - Se muestra el texto recibido en `reply` como mensaje del bot.
+    - Si hay error de red o del servidor:
+      - Mostrar un mensaje genérico: “Lo siento, no pude procesar tu mensaje. Intenta de nuevo.”.
+
+Modelo de datos:
+- Front-end:
+  - `restaurantInfo`:
+    - `nombre`
+    - `eslogan`
+    - `descripcion`
+    - `direccion`
+    - `telefono`
+    - `horario`
+    - `whatsappNumero`
+  - `menuItems`:
+    - `id`
+    - `nombre`
+    - `descripcion`
+    - `precio`
+- Chatbot:
+  - Enviar al backend al menos:
+    - `message`: texto del usuario.
+    - `source`: string fijo (ej. `"web-restaurant"`).
+  - El backend (n8n + GPT) mantiene el conocimiento y las respuestas.
+
+Endpoints API (para el chatbot):
+- Consumir un endpoint externo (n8n) desde el front-end:
+  - Método: POST.
+  - URL: `CHATBOT_API_URL`.
+  - Headers:
+    - `Content-Type: application/json`.
+  - Body JSON:
+    - `message`: texto ingresado por el usuario.
+    - `source`: `"web-restaurant"`.
+  - Respuesta esperada:
+    - JSON con campo `reply` (string).
+  - Manejo de errores:
+    - `try/catch`.
+    - Mensaje de error visible y amable en el chat cuando falle.
+
+Reglas de negocio:
+- WhatsApp:
+  - Solo un botón de WhatsApp en la sección de contacto al final.
+  - Ese botón debe abrir en nueva pestaña.
+- Chatbot:
+  - Debe funcionar independientemente de WhatsApp.
+  - Si `CHATBOT_API_URL` está vacío o el `fetch` falla:
+    - No romper la UI.
+    - Mostrar un mensaje como: “Nuestro asistente no está disponible en este momento. Puedes escribirnos por WhatsApp en la sección de contacto.”
+- Diseño:
+  - Mantener coherencia de colores en hero, botones, chatbot y secciones.
+
+Integraciones:
+- WhatsApp:
+  - Botón en sección de contacto con URL `https://wa.me/NUMERO?text=MENSAJE`.
+- n8n + GPT (backend chatbot):
+  - Suponer que el endpoint HTTP de n8n:
+    - Recibe `message`.
+    - Genera respuesta con GPT.
+    - Devuelve `{ reply: "texto..." }`.
+
+Autenticación y autorización:
+- No se requiere; todo público.
+
+Validaciones y estados de error:
+- Chatbot:
+  - No enviar mensajes vacíos.
+  - Evitar múltiples envíos simultáneos (desactivar botón “Enviar” mientras se espera).
+  - Mostrar errores de red de forma amigable.
+- WhatsApp:
+  - Si no hay número configurado, el botón de WhatsApp:
+    - Debe estar deshabilitado o mostrar un `alert` explicando que no hay número configurado.
+
+UX / Accesibilidad:
+- Colores:
+  - Usar la paleta (vino, dorado, beige) con buen contraste.
+- Hero:
+  - Imagen grande y llamativa, texto legible y sin saturación de colores.
+  - Sin botones de WhatsApp aquí.
+- Chatbot:
+  - Cabecera con color primario (vino tinto) y texto claro.
+  - Burbujas diferenciadas para usuario y bot.
+  - La burbuja flotante debe ser accesible por teclado (`tabindex` y activable con Enter/Espacio).
+  - Input del chat con `aria-label`.
+- Responsive:
+  - Hero en dos columnas en escritorio, una columna en móvil.
+  - Chatbot adaptado para pantallas pequeñas (ancho casi completo, altura controlada).
+
+Requisitos técnicos:
+- Mantener stack actual (HTML5, CSS3, JavaScript puro).
+- Actualizar solo los archivos del proyecto existente:
+  - `index.html`:
+    - Quitar botón de WhatsApp del hero.
+    - Asegurar que el botón de WhatsApp esté solo en la sección de contacto final.
+    - Añadir/modificar la imagen del hero.
+  - `styles.css`:
+    - Aplicar nueva paleta de colores.
+    - Ajustar layout del hero y estilos del chatbot.
+  - `script.js`:
+    - Ajustar la lógica del chatbot para usar el backend IA/GPT vía `fetch`.
+    - Garantizar que la lógica del chatbot no use WhatsApp en ningún punto.
+
+Semillas de datos iniciales:
+- Restaurante de ejemplo:
+  - Nombre: “Restaurante Demo”.
+  - Eslogan: “Sabores caseros todos los días”.
+  - Descripción breve en el hero.
+  - Dirección: “Calle Ejemplo 123, Ciudad, País”.
+  - Teléfono: “+507 6000-0000”.
+  - Horario:
+    - Lunes a Viernes: 11:00–22:00.
+    - Sábado y Domingo: 12:00–23:00.
+- Menú de ejemplo:
+  - 6–8 platos típicos con nombre, descripción y precio.
+- Chatbot:
+  - Mensaje de bienvenida al abrir: “Hola 👋, soy el asistente del Restaurante Demo. Pregúntame sobre el menú, horario o reservaciones.”
+  - Mensaje de error cuando backend no responda.
+
+Pruebas y criterios de aceptación:
+- El hero NO muestra ningún botón de WhatsApp.
+- La sección de contacto final SÍ muestra el único botón de WhatsApp y funciona (abre nueva pestaña).
+- La paleta de colores no usa tonos naranjas.
+- La imagen del hero se muestra correctamente y es responsive.
+- El chatbot:
+  - Se abre al hacer clic en la burbuja.
+  - Recibe mensajes del usuario.
+  - Intenta llamar al endpoint `CHATBOT_API_URL`.
+  - Muestra la respuesta del campo `reply` o un mensaje de error si falla.
+- En móvil:
+  - El hero no se rompe.
+  - Se puede abrir y usar el chatbot.
+  - Se puede llegar a la sección de contacto y usar el botón de WhatsApp.
+
+Despliegue / Configuración:
+- Reutilizar el mismo proyecto en Replit (HTML/CSS/JS).
+- Solo actualizar archivos existentes siguiendo estas instrucciones.
+- Dejar claramente comentado en el código:
+  - Dónde cambiar la URL del backend (`CHATBOT_API_URL`).
+  - Dónde cambiar la URL de la imagen del hero.
+  - Dónde cambiar el número de WhatsApp para la sección de contacto final.

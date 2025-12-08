@@ -2,6 +2,10 @@
 // CONFIGURACIÓN - Editar estos valores según tus necesidades
 // ========================================
 
+// URL del backend del chatbot (n8n con GPT)
+// IMPORTANTE: Reemplaza esta URL con tu endpoint de n8n que conecta con GPT
+const CHATBOT_API_URL = 'https://TU-ENDPOINT-N8N-AQUI';
+
 // Información del restaurante
 const restaurantInfo = {
     nombre: "Restaurante Demo",
@@ -144,19 +148,14 @@ function initializeNavigation() {
     });
 }
 
-// Funcionalidad de WhatsApp
+// Funcionalidad de WhatsApp (solo para el botón de contacto)
 function initializeWhatsApp() {
-    const heroWhatsAppBtn = document.getElementById('heroWhatsAppBtn');
     const contactWhatsAppBtn = document.getElementById('contactWhatsAppBtn');
     
     const whatsappClickHandler = (e) => {
         e.preventDefault();
         openWhatsApp();
     };
-    
-    if (heroWhatsAppBtn) {
-        heroWhatsAppBtn.addEventListener('click', whatsappClickHandler);
-    }
     
     if (contactWhatsAppBtn) {
         contactWhatsAppBtn.addEventListener('click', whatsappClickHandler);
@@ -242,7 +241,7 @@ function openChatbot() {
     
     // Si es la primera vez, mostrar mensaje de bienvenida
     if (chatMessages.length === 0) {
-        addBotMessage("Hola 👋, soy el asistente del Restaurante Demo. ¿En qué puedo ayudarte?");
+        addBotMessage("Hola 👋, soy el asistente del Restaurante Demo. Pregúntame sobre el menú, horario o reservaciones.");
     }
     
     // Focus en el input
@@ -258,8 +257,9 @@ function closeChatbot() {
     chatWindow.setAttribute('aria-hidden', 'true');
 }
 
-function sendMessage() {
+async function sendMessage() {
     const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
     const message = chatInput.value.trim();
     
     // Validar que el mensaje no esté vacío
@@ -267,17 +267,33 @@ function sendMessage() {
         return;
     }
     
+    // Deshabilitar input y botón mientras se procesa
+    chatInput.disabled = true;
+    chatSend.disabled = true;
+    
     // Agregar mensaje del usuario
     addUserMessage(message);
     
     // Limpiar input
     chatInput.value = '';
     
-    // Generar respuesta del bot
-    setTimeout(() => {
-        const botResponse = generateBotResponse(message);
+    // Mostrar indicador de "Escribiendo..."
+    const typingIndicator = addTypingIndicator();
+    
+    // Obtener respuesta del backend
+    try {
+        const botResponse = await sendMessageToBackend(message);
+        removeTypingIndicator(typingIndicator);
         addBotMessage(botResponse);
-    }, 500);
+    } catch (error) {
+        removeTypingIndicator(typingIndicator);
+        addBotMessage("Lo siento, no pude procesar tu mensaje. Puedes escribirnos por WhatsApp en la sección de contacto.");
+    } finally {
+        // Habilitar de nuevo input y botón
+        chatInput.disabled = false;
+        chatSend.disabled = false;
+        chatInput.focus();
+    }
 }
 
 function addUserMessage(message) {
@@ -307,56 +323,69 @@ function renderMessage(type, text) {
     chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
 }
 
-function generateBotResponse(userMessage) {
-    const messageLower = userMessage.toLowerCase();
-    
-    // Respuesta para "menú"
-    if (messageLower.includes('menu') || messageLower.includes('menú') || messageLower.includes('platos') || messageLower.includes('comida')) {
-        return `Nuestro menú incluye: ${menuItems.slice(0, 4).map(item => item.nombre).join(', ')} y más. Puedes ver el menú completo en nuestra página. ¿Te gustaría reservar?`;
+// Enviar mensaje al backend (n8n + GPT)
+async function sendMessageToBackend(message) {
+    // Verificar que la URL del backend esté configurada
+    if (!CHATBOT_API_URL || CHATBOT_API_URL === 'https://TU-ENDPOINT-N8N-AQUI') {
+        // Si no está configurado, usar respuesta de fallback
+        console.warn('CHATBOT_API_URL no está configurado. Usando respuestas de fallback.');
+        throw new Error('Backend no configurado');
     }
     
-    // Respuesta para "horario"
-    if (messageLower.includes('horario') || messageLower.includes('hora') || messageLower.includes('abierto') || messageLower.includes('cuando')) {
-        return `Nuestro horario es: ${restaurantInfo.horario.semana} y ${restaurantInfo.horario.finDeSemana}. ¡Te esperamos!`;
-    }
-    
-    // Respuesta para "dirección"
-    if (messageLower.includes('direccion') || messageLower.includes('dirección') || messageLower.includes('ubicacion') || messageLower.includes('ubicación') || messageLower.includes('donde')) {
-        return `Nos encontramos en ${restaurantInfo.direccion}. Puedes ver el mapa en nuestra sección de contacto.`;
-    }
-    
-    // Respuesta para "precio" o "costo"
-    if (messageLower.includes('precio') || messageLower.includes('costo') || messageLower.includes('cuanto')) {
-        return `Nuestros platos tienen precios desde $4.50 hasta $13.50. Puedes ver los precios completos en nuestro menú.`;
-    }
-    
-    // Respuesta para "reserva"
-    if (messageLower.includes('reserva') || messageLower.includes('reservar')) {
-        return `Para hacer una reserva, puedes contactarnos por WhatsApp haciendo clic en el botón "Reservar por WhatsApp" en nuestra página.`;
-    }
-    
-    // Respuesta genérica
-    return "Gracias por escribirnos. En breve un asesor responderá a tu consulta. También puedes contactarnos directamente por WhatsApp.";
-}
-
-// Placeholder para futura integración con API de IA
-// Descomenta y configura cuando tengas un endpoint de chatbot con IA
-/*
-async function fetchAIResponse(userMessage) {
     try {
-        const response = await fetch('/api/chat', {
+        const response = await fetch(CHATBOT_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ message: userMessage })
+            body: JSON.stringify({
+                message: message,
+                source: 'web-restaurant'
+            })
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
-        return data.response;
+        
+        // El backend debería devolver { reply: "texto de respuesta" }
+        if (data.reply) {
+            return data.reply;
+        } else {
+            throw new Error('Formato de respuesta inválido');
+        }
     } catch (error) {
-        console.error('Error al contactar con la IA:', error);
-        return "Lo siento, no pude procesar tu mensaje. Intenta de nuevo.";
+        console.error('Error al contactar con el backend del chatbot:', error);
+        throw error;
     }
 }
-*/
+
+// Agregar indicador de "Escribiendo..."
+function addTypingIndicator() {
+    const chatMessagesContainer = document.getElementById('chatMessages');
+    
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'chat-message bot typing-indicator';
+    typingDiv.id = 'typingIndicator';
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'message-bubble';
+    bubbleDiv.innerHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+    
+    typingDiv.appendChild(bubbleDiv);
+    chatMessagesContainer.appendChild(typingDiv);
+    
+    // Scroll al último mensaje
+    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+    
+    return typingDiv;
+}
+
+// Remover indicador de "Escribiendo..."
+function removeTypingIndicator(indicator) {
+    if (indicator && indicator.parentNode) {
+        indicator.parentNode.removeChild(indicator);
+    }
+}
