@@ -1,0 +1,215 @@
+Plataforma destino:
+- Replit (app web estática con HTML, CSS y JavaScript puros)
+
+Objetivo:
+- Crear una página web sencilla para un restaurante que muestre información básica (nombre, descripción breve, dirección, horario) y ofrezca:
+  - Botón/enlace directo a WhatsApp.
+  - Visualización clara de la dirección.
+  - Un chatbot básico accesible desde una burbuja flotante, listo tanto en escritorio como en móviles.
+
+Alcance (MVP):
+- Sitio de una sola página (single-page) con secciones:
+  - Hero (portada con nombre del restaurante y CTA).
+  - Descripción corta del restaurante.
+  - Sección de menú resumido (no es necesario CRUD, solo estático).
+  - Sección de horario de atención.
+  - Sección de contacto (WhatsApp, dirección, mapa opcional embebido).
+- Burbuja flotante de chatbot siempre visible:
+  - Al hacer clic, se abre una ventana/box de chat sobre la página.
+  - El chat puede usar respuestas simples predefinidas (no se requiere IA real).
+- Diseño completamente responsive:
+  - Optimizado para pantallas de escritorio y móviles.
+  - Menú de navegación simple (scroll a secciones).
+
+Roles de usuario:
+- Visitante (usuario anónimo):
+  - Navega por la única página.
+  - Ve información de restaurante.
+  - Hace clic en WhatsApp para iniciar chat externo.
+  - Usa el chatbot embebido para preguntas frecuentes.
+- Administrador (rol implícito, sin interfaz):
+  - No requiere panel de administración; el contenido se modifica editando el código.
+
+Funcionalidades clave:
+- Página principal:
+  - Header con logo o nombre del restaurante y navegación por anclas (Inicio, Menú, Horario, Contacto).
+  - Hero con:
+    - Nombre del restaurante (ej. “Restaurante Demo”).
+    - Eslogan corto.
+    - Botón primario “Reservar por WhatsApp” que abre WhatsApp.
+- Información del restaurante:
+  - Bloque de texto con:
+    - Breve descripción (tipo de comida, ambiente).
+    - Horario (por ejemplo: Lunes–Domingo 11:00–22:00).
+- Sección de menú:
+  - Lista simple de 6–8 platos de ejemplo con:
+    - Nombre del plato.
+    - Descripción breve.
+    - Precio aproximado.
+- Sección de contacto:
+  - Dirección en texto.
+  - Teléfono de contacto.
+  - Botón/enlace a WhatsApp.
+  - Opcional: iframe de Google Maps con una ubicación de ejemplo.
+- Burbuja de chatbot:
+  - Ícono circular (por ejemplo ícono de chat) fijo en la esquina inferior derecha.
+  - Al hacer clic:
+    - Se despliega una ventana de chat (type “card”) con:
+      - Encabezado con nombre del restaurante e ícono de cerrar.
+      - Área scrollable de mensajes.
+      - Input de texto y botón “Enviar”.
+  - Lógica de chatbot simple:
+    - Al enviar un mensaje:
+      - Se muestra el mensaje del usuario en el historial.
+      - El bot responde con mensajes predefinidos según palabras clave:
+        - Si el mensaje contiene “menú” → responder con resumen del menú.
+        - Si contiene “horario” → responder con horario.
+        - Si contiene “dirección” → responder con la dirección.
+        - En cualquier otro caso → respuesta genérica “Gracias por escribirnos, en breve un asesor responderá.”.
+- Enlace a WhatsApp:
+  - Implementar link del estilo: `https://wa.me/50760000000?text=Hola%20quiero%20información%20sobre%20reservas`
+  - Dejar en el código un comentario claro indicando que el número debe reemplazarse por el número real del restaurante.
+
+Flujos principales:
+- Flujo 1: Usuario visita la página
+  - Abre la URL.
+  - Ve hero con CTA “Reservar por WhatsApp”.
+  - Navega por las secciones usando el menú de navegación o haciendo scroll.
+- Flujo 2: Usuario abre WhatsApp
+  - Hace clic en:
+    - Botón principal de hero, o
+    - Botón de contacto.
+  - Se abre nueva pestaña con conversación de WhatsApp al número configurado y mensaje prellenado.
+- Flujo 3: Usuario usa el chatbot
+  - Hace clic en la burbuja flotante.
+  - Se abre ventana de chat.
+  - Escribe una pregunta y pulsa “Enviar” o tecla Enter.
+  - El mensaje del usuario se agrega al historial.
+  - El bot devuelve una respuesta según las reglas de palabras clave.
+  - El usuario puede cerrar la ventana de chat con el botón de cerrar.
+- Flujo 4: Usuario consulta la dirección
+  - Sección de contacto muestra la dirección en texto legible.
+  - (Opcional) Ve un mapa embebido con la ubicación del restaurante.
+
+Modelo de datos (estático en front-end):
+- Estructuras definidas en JavaScript como arrays/objetos:
+  - `menuItems`:
+    - `id`: número.
+    - `nombre`: string.
+    - `descripcion`: string.
+    - `precio`: number o string.
+  - `restaurantInfo`:
+    - `nombre`: string.
+    - `eslogan`: string.
+    - `descripcion`: string.
+    - `direccion`: string.
+    - `telefono`: string.
+    - `whatsappNumero`: string.
+    - `horario`: objeto o texto con días y horas.
+- No se requiere base de datos ni backend.
+
+Endpoints API:
+- Para el MVP, no usar backend ni endpoints externos (el chatbot es completamente front-end con lógica mínima).
+- Dejar comentado un placeholder en el código para integrar en el futuro un endpoint de IA (por ejemplo `fetch('/api/chat')`) sin implementarlo ahora.
+
+Reglas de negocio:
+- El botón/enlace de WhatsApp debe abrir siempre en nueva pestaña/ventana del navegador.
+- La burbuja de chatbot debe estar visible en todas las resoluciones (desktop y mobile).
+- La ventana del chatbot no debe cubrir totalmente la pantalla en escritorio:
+  - Ancho recomendado: 320–380 px.
+  - Altura: ~60–70% de la altura de la pantalla.
+- En móviles, al abrir el chatbot:
+  - La ventana puede ocupar hasta el 90–100% del ancho de la pantalla y ~70–80% de la altura para mayor comodidad.
+- El número de WhatsApp y la dirección deben estar definidos en variables fácilmente editables al inicio del archivo JS o en un archivo de configuración simple.
+
+Integraciones:
+- WhatsApp:
+  - Implementar mediante URL `https://wa.me/` con número en formato internacional (ejemplo: `50760000000`).
+  - Incluir mensaje predefinido para reservas.
+- Google Maps (opcional pero preferible):
+  - Incluir iframe con mapa de ejemplo en la sección de contacto.
+  - Dejar comentarios indicando dónde cambiar la ubicación si el usuario lo desea.
+
+Autenticación y autorización:
+- No se requiere autenticación.
+- Todo el sitio y el chatbot son públicos.
+
+Validaciones y estados de error:
+- Chatbot:
+  - No permitir envío de mensajes vacíos (si el input está vacío o solo espacios, no hacer nada o mostrar un mensaje de error suave).
+- WhatsApp:
+  - Si la URL de WhatsApp no está configurada (por ejemplo, número vacío), mostrar un `alert` o mensaje en pantalla indicando “Número de WhatsApp no configurado” en lugar de intentar abrir el enlace.
+- Manejo básico de errores en JavaScript:
+  - En caso de fallos de script, evitar que la página quede inutilizable; usar bloques try/catch donde sea razonable.
+
+UX / Accesibilidad:
+- Diseño:
+  - Estilo limpio, moderno, con colores cálidos (por ejemplo, tonos naranja/rojo para el CTA y grises claros de fondo).
+  - Tipografía de Google Fonts (por ejemplo “Poppins” o “Roboto”).
+- Responsive:
+  - Usar Flexbox y/o CSS Grid.
+  - Crear media queries para al menos:
+    - Mobile: < 768px.
+    - Desktop: ≥ 768px.
+- Navegación:
+  - Menú fijo en la parte superior en escritorio.
+  - En móvil, usar un menú sencillo colapsable (ícono hamburguesa) o una barra simple con enlaces apilados.
+- Accesibilidad:
+  - Contraste adecuado entre texto y fondo.
+  - Etiquetas `alt` descriptivas en imágenes.
+  - Usar roles ARIA básicos donde aplique (por ejemplo, para la ventana del chatbot `role="dialog"`).
+  - La burbuja de chat debe ser accesible por teclado (focusable y activable con Enter/Espacio).
+
+Requisitos técnicos:
+- Stack:
+  - HTML5 para la estructura.
+  - CSS3 para estilos (archivo separado `styles.css`).
+  - JavaScript puro para comportamiento (`script.js`).
+- Estructura de archivos en Replit:
+  - `index.html`
+  - `styles.css`
+  - `script.js`
+- Organización:
+  - No usar frameworks pesados (React, Vue, etc.) para mantener simplicidad.
+  - Comentar las secciones clave del código para que el usuario pueda editar textos, número de WhatsApp, dirección y menú fácilmente.
+
+Semillas de datos iniciales:
+- Restaurante de ejemplo:
+  - Nombre: “Restaurante Demo”.
+  - Eslogan: “Sabores caseros todos los días”.
+  - Descripción: Texto corto (3–4 líneas) indicando que ofrece comida típica y ambiente familiar.
+  - Dirección: “Calle Ejemplo 123, Ciudad, País”.
+  - Teléfono: “+507 6000-0000”.
+  - Horario:
+    - Lunes a Viernes: 11:00–22:00.
+    - Sábado y Domingo: 12:00–23:00.
+- Menú de ejemplo:
+  - 6–8 platos repartidos entre entradas, platos fuertes y postres, con precios en moneda local (por ejemplo, “$8.50”).
+- Mensajes del chatbot:
+  - Mensaje de bienvenida automático al abrir el chat: “Hola 👋, soy el asistente del Restaurante Demo. ¿En qué puedo ayudarte?”.
+  - Respuestas predefinidas para “menú”, “horario”, “dirección” y mensaje genérico.
+
+Pruebas y criterios de aceptación:
+- Visualización:
+  - La página se ve correctamente en un navegador de escritorio (≥1366 px de ancho) y en simulación móvil (~360–414 px).
+- WhatsApp:
+  - Al hacer clic en los botones/enlaces de WhatsApp, se abre correctamente la pestaña con la URL usando el número configurado.
+- Chatbot:
+  - La burbuja flotante siempre se ve en la esquina inferior derecha.
+  - Al hacer clic, se abre la ventana de chat; al pulsar el icono de cerrar, se oculta.
+  - Al enviar un mensaje con la palabra “menú”, “horario” o “dirección”, la respuesta del bot contiene la información correspondiente.
+  - Mensajes vacíos no se envían.
+- Navegación:
+  - Los enlaces del menú llevan correctamente a sus secciones mediante scroll suave.
+- Responsive:
+  - No hay desbordes horizontales (no aparece scroll lateral innecesario).
+  - El chatbot es usable en móvil (input accesible, texto legible, se puede cerrar la ventana).
+
+Despliegue / Configuración:
+- Configurar el proyecto en Replit como:
+  - Tipo: HTML/CSS/JS.
+  - Archivo principal: `index.html`.
+- Asegurar que:
+  - El número de WhatsApp se define en una constante fácilmente identificable y comentada.
+  - La dirección del restaurante se define en el objeto `restaurantInfo`.
+- Ejecutar el proyecto en Replit y verificar la vista previa embebida tanto en tamaño de escritorio como reduciendo el ancho de la ventana para simular móvil.
