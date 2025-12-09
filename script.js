@@ -247,8 +247,8 @@ function initializeChatbot() {
     if (chatSend) {
         chatSend.addEventListener('click', sendMessage);
     }
-    
-     // Enviar mensaje con Enter
+
+    // Enviar mensaje con Enter
     if (chatInput) {
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -257,6 +257,7 @@ function initializeChatbot() {
             }
         });
     }
+}
 
 
 function openChatbot() {
