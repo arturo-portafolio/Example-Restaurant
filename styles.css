@@ -509,6 +509,12 @@ section {
     font-family: 'Poppins', sans-serif;
     font-size: 0.95rem;
     outline: none;
+
+    /* AÑADIR ESTO */
+    min-height: 40px;
+    max-height: 100px;
+    overflow-y: auto;
+    resize: none;
 }
 
 .chat-input:focus {
@@ -528,6 +534,9 @@ section {
     justify-content: center;
     color: var(--text-light);
     transition: all 0.3s ease;
+
+    /* AÑADIR ESTO */
+    flex-shrink: 0;
 }
 
 .chat-send:hover {
