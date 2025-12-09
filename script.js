@@ -248,7 +248,7 @@ function initializeChatbot() {
         chatSend.addEventListener('click', sendMessage);
     }
     
-    // Enviar mensaje con Enter
+    // Enviar mensaje con Enter + ajustar ventana cuando se abre el teclado en móvil
     if (chatInput) {
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -256,8 +256,21 @@ function initializeChatbot() {
                 sendMessage();
             }
         });
+
+        // Cuando el input toma foco (abre teclado), reducir altura del chat en móvil
+        chatInput.addEventListener('focus', () => {
+            if (window.innerWidth <= 768 && chatWindow) {
+                chatWindow.classList.add('keyboard-open');
+            }
+        });
+
+        // Cuando pierde foco (se cierra teclado), restaurar altura normal
+        chatInput.addEventListener('blur', () => {
+            if (chatWindow) {
+                chatWindow.classList.remove('keyboard-open');
+            }
+        });
     }
-}
 
 function openChatbot() {
     const chatWindow = document.getElementById('chatWindow');
