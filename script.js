@@ -246,10 +246,13 @@ function openChatbot() {
     chatWindow.classList.add('active');
     chatWindow.setAttribute('aria-hidden', 'false');
     
-    // Si es la primera vez, mostrar mensaje de bienvenida
-    if (chatMessages.length === 0) {
-        addBotMessage("Hola 👋, soy el asistente del Restaurante Demo. Pregúntame sobre el menú, horario o reservaciones.");
-    }
+// Si es la primera vez, mostrar mensaje de bienvenida
+if (chatMessages.length === 0) {
+    addBotMessage(
+        "Hola 👋, soy el asistente del Restaurante Demo. Tienes tres preguntas para hacerme sobre el menú, horario o precios. Después de eso, por favor contáctanos por WhatsApp."
+    );
+}
+
     
     // Focus en el input
     const chatInput = document.getElementById('chatInput');
@@ -273,7 +276,13 @@ async function sendMessage() {
         return;
     }
 
-    // Si ya está esperando respuesta, no permitir otro envío
+    // Si ya se llegó al límite de preguntas, solo mostrar mensaje fijo y no llamar al backend
+    if (chatLocked) {
+        addBotMessage("Lo siento, no puedo responder más preguntas. Puedes escribirnos por WhatsApp en la sección de contacto.");
+        return;
+    }
+
+    // Evitar doble envío mientras hay una respuesta en curso
     if (chatInput.disabled || chatSend.disabled) {
         return;
     }
@@ -285,7 +294,10 @@ async function sendMessage() {
         return;
     }
 
-    // Deshabilitar input y botón mientras se procesa
+    // Contar esta pregunta (el saludo inicial del bot NO se cuenta)
+    questionCount += 1;
+
+    // Deshabilitar input y botón mientras se procesa (modo frost)
     chatInput.disabled = true;
     chatSend.disabled = true;
     chatInput.classList.add('chat-input-disabled');
@@ -300,16 +312,33 @@ async function sendMessage() {
     // Mostrar indicador de "Escribiendo..."
     const typingIndicator = addTypingIndicator();
 
-    // Obtener respuesta del backend
     try {
         const botResponse = await sendMessageToBackend(message);
+
         removeTypingIndicator(typingIndicator);
-        addBotMessage(botResponse);
+
+        // Ajustar respuesta según el nº de pregunta
+        let finalResponse = botResponse;
+
+        if (questionCount === 1) {
+            // 1ª pregunta respondida
+            finalResponse = botResponse + " Te quedan 2 preguntas más.";
+        } else if (questionCount === 2) {
+            // 2ª pregunta respondida
+            finalResponse = botResponse + " Te queda 1 pregunta más, ¿qué más deseas preguntar?";
+        } else if (questionCount === 3) {
+            // 3ª pregunta respondida: cerrar sesión de preguntas
+            finalResponse = botResponse + " Esta fue tu tercera pregunta. Para todo lo demás, por favor contáctanos por WhatsApp en la sección de contacto.";
+            chatLocked = true;
+        }
+
+        addBotMessage(finalResponse);
     } catch (error) {
         removeTypingIndicator(typingIndicator);
+        // Mensaje estándar cuando hay error con el backend
         addBotMessage("Lo siento, no pude procesar tu mensaje. Puedes escribirnos por WhatsApp en la sección de contacto.");
     } finally {
-        // Habilitar de nuevo input y botón
+        // Volver a habilitar input y botón (aunque esté bloqueado lógicamente)
         chatInput.disabled = false;
         chatSend.disabled = false;
         chatInput.classList.remove('chat-input-disabled');
@@ -317,6 +346,7 @@ async function sendMessage() {
         chatInput.focus();
     }
 }
+
 
 
 function addUserMessage(message) {
