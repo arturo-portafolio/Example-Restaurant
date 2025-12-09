@@ -199,6 +199,8 @@ function updateContactInfo() {
 // ========================================
 
 let chatMessages = [];
+let questionCount = 0;   // nº de preguntas del usuario
+let chatLocked = false;  // true cuando ya llegó al límite
 
 function initializeChatbot() {
     const chatBubble = document.getElementById('chatBubble');
