@@ -640,6 +640,13 @@ section {
         height: 70vh;
     }
 
+        /* Cuando se abre el teclado en móvil, bajamos un poco la ventana y la hacemos más baja */
+    .chat-window.keyboard-open {
+        bottom: 0;
+        height: 55vh; /* aprox 3/4 de lo que tenías antes */
+    }
+
+
     .chat-bubble {
         right: 20px;
         bottom: 20px;
