@@ -267,7 +267,7 @@ function openChatbot() {
 // Si es la primera vez, mostrar mensaje de bienvenida
 if (chatMessages.length === 0) {
     addBotMessage(
-        "Hola 👋, soy el asistente del Restaurante Demo. Tienes tres preguntas para hacerme sobre el menú, horario o precios. Después de eso, por favor contáctanos por WhatsApp."
+        "Hola 👋, soy el asistente del Restaurante Demo. Tienes cuatro preguntas para hacerme sobre el menú, horario o precios. Después de eso, por favor contáctanos por WhatsApp."
     );
 }
 
